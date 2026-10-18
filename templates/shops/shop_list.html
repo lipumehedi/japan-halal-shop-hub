@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Find Halal Shops in Japan | Japan Halal Shop Hub{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">DISCOVER LOCAL • SUPPORT LOCAL</div>
+      <h1>Your guide to<br><span>halal shopping</span> in Japan.</h1>
+      <p>Find halal groceries, restaurants, meat shops and online stores. Explore your area and help trusted local businesses grow.</p>
+      <a class="button button-light" href="#directory">Explore the directory <span>↓</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="hero-card"><span class="hero-icon">☪</span><span class="hero-card-title">Local finds</span><span class="hero-card-sub">Across Japan</span></div>
+      <span class="floating-tag tag-one">🥬 Grocery</span><span class="floating-tag tag-two">🍜 Restaurant</span><span class="floating-tag tag-three">📍 Nearby</span>
+    </div>
+  </div>
+</section>
+<section class="container directory" id="directory">
+  <div class="section-heading"><div><div class="eyebrow green">THE DIRECTORY</div><h2>Find your next favourite shop</h2><p class="muted">Search by name, city, category or prefecture.</p></div><div class="count-pill"><strong>{{ result_count }}</strong> listing{{ result_count|pluralize }}</div></div>
+  <form class="filter-panel" method="get">
+    <label class="search-field"><span>⌕</span><input type="search" name="q" placeholder="Shop name, city or keyword…" value="{{ query }}"></label>
+    <select name="prefecture" aria-label="Prefecture"><option value="">All prefectures</option>{% for value,label in prefectures %}<option value="{{ value }}" {% if selected_prefecture == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="category" aria-label="Category"><option value="">All categories</option>{% for value,label in categories %}<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="halal_status" aria-label="Halal status"><option value="">All status labels</option><option value="verified" {% if selected_halal_status == "verified" %}selected{% endif %}>Certification checked</option><option value="owner" {% if selected_halal_status == "owner" %}selected{% endif %}>Owner says halal</option><option value="unconfirmed" {% if selected_halal_status == "unconfirmed" %}selected{% endif %}>Not yet confirmed</option></select>
+    <button class="button button-green" type="submit">Search</button>
+    {% if query or selected_prefecture or selected_category or selected_halal_status %}<a class="reset-link" href="{% url 'shop_list' %}">Reset</a>{% endif %}
+  </form>
+  {% if shops %}
+  <div class="shop-grid">
+    {% for shop in shops %}
+    <article class="shop-card">
+      <a class="shop-card-link" href="{{ shop.get_absolute_url }}">
+
+<div class="shop-image"> {% if shop.image_url %} <img class="shop-photo" src="{{ shop.image_url }}" alt="{{ shop.name }}" loading="lazy"> {% else %}
+    <span class="shop-emoji" aria-hidden="true">
+      {% if shop.category == "restaurant" %}
+        🍜
+      {% elif shop.category == "butcher" %}
+        🥩
+      {% elif shop.category == "cosmetics" %}
+        🧴
+      {% elif shop.category == "online" %}
+        📦
+      {% else %}
+        🛍️
+      {% endif %}
+    </span>
+  {% endif %}
+
+  <span class="category-tag"> {{ shop.get_category_display }} </span>
+</div>
+
+        <div class="shop-info">
+          <div class="shop-location">📍 {{ shop.city|default:shop.prefecture }}, Japan</div>
+          <h3>{{ shop.name }}</h3>
+          <p class="shop-description">{{ shop.description|truncatechars:115 }}</p>
+          <div class="card-bottom"><span class="status status-{{ shop.halal_status }}">{{ shop.get_halal_status_display }}</span><span class="rating">{% if shop.average_rating %}★ {{ shop.average_rating|floatformat:1 }} <small>({{ shop.review_count }})</small>{% else %}<span class="muted">No reviews yet</span>{% endif %}</span></div>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><span>🔎</span><h3>No shops found just yet</h3><p>Try a different search, or help the community by adding a shop.</p><a class="button button-green" href="{% url 'submit_shop' %}">Add a shop</a></div>
+  {% endif %}
+</section>
+<section class="owner-banner"><div class="container owner-inner"><div><div class="eyebrow">FOR SHOP OWNERS</div><h2>Good shops deserve to be discovered.</h2><p>Add your business so local customers can find you. Listings are reviewed before going public.</p></div><a class="button button-light" href="{% url 'submit_shop' %}">List your shop <span>→</span></a></div></section>
+{% endblock %}

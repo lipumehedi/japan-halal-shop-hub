@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Add a Shop | Japan Halal Shop Hub{% endblock %}
+{% block content %}
+<section class="container form-page">
+  <a class="back-link" href="{% url 'shop_list' %}">← Back to directory</a>
+  <div class="form-card"><div class="eyebrow green">GROW THE COMMUNITY</div><h1>Add a halal shop</h1><p class="muted">Know a great shop in Japan? Share its details. Your listing will stay private until an admin reviews and approves it.</p>
+    <form method="post" class="listing-form">{% csrf_token %}
+      {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<small class="error">{{ error }}</small>{% endfor %}</div>{% endfor %}
+      <button class="button button-green button-wide" type="submit">Submit for review →</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

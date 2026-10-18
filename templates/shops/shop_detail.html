@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ shop.name }} | Japan Halal Shop Hub{% endblock %}
+{% block content %}
+<section class="container detail-wrap">
+  <a class="back-link" href="{% url 'shop_list' %}">← Back to all shops</a>
+  <div class="detail-card">
+    <div class="detail-visual">{% if shop.image_url %} <img class="detail-photo" src="{{ shop.image_url }}" alt="{{ shop.name }}" loading="lazy"> {% else %} <span aria-hidden="true"> {% if shop.category == "restaurant" %} 🍜 {% elif shop.category == "butcher" %} 🥩 {% else %} 🛍️ {% endif %} </span> {% endif %} </div>
+    <div class="detail-content">
+      <div class="shop-location">📍 {{ shop.city|default:shop.prefecture }}, Japan</div>
+      <h1>{{ shop.name }}</h1>
+      <div class="detail-tags"><span class="category-tag">{{ shop.get_category_display }}</span><span class="status status-{{ shop.halal_status }}">{{ shop.get_halal_status_display }}</span></div>
+      <p class="detail-description">{{ shop.description|linebreaksbr }}</p>
+      <div class="info-list">
+        {% if shop.address %}<div><span>Address</span><strong>{{ shop.address }}</strong></div>{% endif %}
+        {% if shop.opening_hours %}<div><span>Opening hours</span><strong>{{ shop.opening_hours }}</strong></div>{% endif %}
+        {% if shop.phone %}<div><span>Phone</span><strong>{{ shop.phone }}</strong></div>{% endif %}
+        {% if shop.website %}<div><span>Website</span><strong><a href="{{ shop.website }}" target="_blank" rel="noopener noreferrer">Visit website ↗</a></strong></div>{% endif %}
+      </div>
+      <div class="halal-note"><strong>Important halal note</strong><p>This directory is a discovery tool, not a religious certification body. Please contact the shop directly to confirm current certification, ingredients and food preparation.</p></div>
+    </div>
+  </div>
+  <section class="reviews-section">
+    <div class="section-heading"><div><div class="eyebrow green">COMMUNITY FEEDBACK</div><h2>Customer reviews</h2></div><div class="count-pill">{% if shop.average_rating %}★ {{ shop.average_rating|floatformat:1 }} / 5{% else %}No ratings yet{% endif %}</div></div>
+    {% for review in reviews %}<article class="review"><div class="review-head"><strong>{{ review.reviewer_name }}</strong><span class="rating">★ {{ review.rating }} / 5</span></div><p>{{ review.comment|linebreaksbr }}</p><small>{{ review.created_at|date:"M d, Y" }}</small></article>{% empty %}<p class="muted">No approved reviews yet. Be the first to share useful feedback.</p>{% endfor %}
+    <div class="review-form"><h3>Leave a review</h3><p class="muted">Reviews are checked by an admin before they appear publicly.</p><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button button-green" type="submit">Submit review</button></form></div>
+  </section>
+</section>
+{% endblock %}
